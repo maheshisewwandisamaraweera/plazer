@@ -127,7 +127,6 @@
               }
             />
     
-    
             <FormControlLabel
               control={<Checkbox {...register("accept", { required: true })} />}
               label="Accept all conditions"
