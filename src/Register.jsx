@@ -1,5 +1,5 @@
 
-            import React from 'react';
+            import React, { useState } from 'react';
             import { useForm } from 'react-hook-form';
             import { Button,Grid, Checkbox, Container, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
             import { styled, useTheme } from '@mui/system';
@@ -29,10 +29,55 @@
               
               
             }));
-            
-            export default function Register() {
+
+            const Register = () => {
               const { register, formState: { errors }, handleSubmit } = useForm();
               const theme = useTheme();
+              const [passwordStrength, setPasswordStrength] = useState('');
+              const [confirmPassword, setConfirmPassword] = useState('');
+
+
+            
+
+            const handlePasswordChange = (event) => {
+              const password = event.target.value;
+              const strength = calculatePasswordStrength(password);
+              setPasswordStrength(strength);
+            };
+
+            const calculatePasswordStrength = (password) => {
+              if (password.length >= 8) {
+                return 'strong';
+              }
+              else if(password.length >=6){
+                return 'weak';
+              }
+              else{
+                return 'poor';
+              }
+            };
+
+            const getStrenghtColor = () => {
+              switch (passwordStrength) {
+                case 'strong':
+                  return 'green';
+                  case 'weak':
+                    return 'yellow';
+                    case 'poor':
+                      return 'red';
+                      default:
+                        return 'black';
+              }
+            };
+
+            const handleConfirmPasswordChange = (event) => {
+              setConfirmPassword(event.target.value);
+            };
+
+            const isPasswordMatch = (value) => {
+              return value === confirmPassword;
+            };
+
             
               const onSubmit = (data) => {
                 console.log(data);
@@ -55,9 +100,9 @@
                         <Grid style={{alignItems:'center', display:'flex'}}>
                         <img src={logo} alt="" width="50px" height="50px"/>
 
-<Typography style={{color:'white'}}>
-    PLAZER
-</Typography>
+               <Typography style={{color:'white'}}>
+              PLAZER
+               </Typography>
                         </Grid>
                         
 
@@ -69,24 +114,53 @@
                   <Grid style={{alignItems:'center', justifyContent:'center',display:'flex'}}>
                     <Typography variant="h4" >Create your Super App Account</Typography>
                     </Grid>
+
+                    <TextField
+              label="Full Name"
+              {...register("fullname", { required: true })}
+              error={!!errors.fullname}
+              helperText={errors.fullname?.type === "required" && "Fullname is required"}
+            />
+
+             <TextField
+              label="Username"
+              {...register("username", { required: true })}
+              error={!!errors.username}
+              helperText={errors.username?.type === "required" && "username is required"}
+            />
                   <TextField
               label="Email"
               {...register("email", { required: true, pattern: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/i })}
               error={!!errors.email}
               helperText={errors.email?.type === "required" ? "Email is required" : errors.email?.type === "pattern" ? "Invalid email format" : ""}
             />
-    
-            <TextField
-              label="Full Name"
-              {...register("fullname", { required: true })}
-              error={!!errors.fullname}
-              helperText={errors.fullname?.type === "required" && "Fullname is required"}
+
+             <TextField
+              label="Telephone Number"
+              {...register("telephone_number", { required: true, minLength: 10, maxLength: 10 })}
+              error={!!errors.telephone_number}
+              helperText={
+                errors.telephone_number?.type === "required" && "Telephone number is required" ||
+                errors.telephone_number?.type === "minLength" && "Entered telephone number is less than 10 digits" ||
+                errors.telephone_number?.type === "maxLength" && "Entered telephone number is more than 10 digits"
+              }
             />
+
+              <TextField
+              label="Address"
+              {...register("address", { required: true })}
+              error={!!errors.address}
+              helperText={errors.address?.type === "required" && "Address is required"}
+            />
+    
     
             <TextField
               label="Password"
               type="password"
               {...register("password", { required: true, minLength: 6, maxLength: 10, pattern: /^[a-zA-Z0-9_]+$/i })}
+              onChange={(e) => {
+                handlePasswordChange(e); }
+              }
               error={!!errors.password}
               helperText={
                 errors.password?.type === "required" && "Password is required" ||
@@ -95,13 +169,31 @@
                 errors.password?.type === "maxLength" && "Password should be at most 10 characters"
               }
             />
-    
+
             <TextField
-              label="Address"
-              {...register("address", { required: true })}
-              error={!!errors.address}
-              helperText={errors.address?.type === "required" && "Address is required"}
+              label=" Confirm Password"
+              type=" password"
+              value={confirmPassword}
+              onChange={handleConfirmPasswordChange}
+              {...register(" confirm password", { required: true, 
+                validate: isPasswordMatch,
+              })}
+
+              error={!!errors.confirmpassword}
+              helperText={
+                errors. confirmpassword?.type === "required" && " Confirm Password is required" ||
+                errors.confirmpassword?.type === "validate" && "Password do not match" 
+                 
+              }
             />
+
+            <div style={{ color: getStrenghtColor(), marginBottom: theme.spacing(2)}}>
+              {passwordStrength === 'strong' && 'Strong Password'}
+              {passwordStrength === 'weak' && 'Weak Password'}
+              {passwordStrength === 'poor' && 'Poor Password'}
+            </div>
+    
+            
     
             <FormControl>
               <InputLabel>Organization Name</InputLabel>
@@ -116,16 +208,7 @@
               </Select>
             </FormControl>
     
-            <TextField
-              label="Telephone Number"
-              {...register("telephone_number", { required: true, minLength: 10, maxLength: 10 })}
-              error={!!errors.telephone_number}
-              helperText={
-                errors.telephone_number?.type === "required" && "Telephone number is required" ||
-                errors.telephone_number?.type === "minLength" && "Entered telephone number is less than 10 digits" ||
-                errors.telephone_number?.type === "maxLength" && "Entered telephone number is more than 10 digits"
-              }
-            />
+            
     
             <FormControlLabel
               control={<Checkbox {...register("accept", { required: true })} />}
@@ -139,6 +222,8 @@
                   </StyledForm>
                 </StyledContainer>
               );
-            }
+            };
+
+            export default Register;
             
         
